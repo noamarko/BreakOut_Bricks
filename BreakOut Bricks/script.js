@@ -26,7 +26,7 @@ var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 
 var bricks = [];
-var colors = []
+var colors = [];
 for(var i = 0; i < brickColumnCount; i++){
   bricks[i] = [];
   colors[i] = []
