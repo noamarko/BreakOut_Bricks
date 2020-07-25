@@ -26,10 +26,13 @@ var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 
 var bricks = [];
+var colors = []
 for(var i = 0; i < brickColumnCount; i++){
   bricks[i] = [];
+  colors[i] = []
   for(var j = 0; j < brickRowCount; j++){
     bricks[i][j] = { x: 0, j: 0, status: 1};
+    colors[i][j] = RandColor();
   }
 }
 
@@ -92,7 +95,7 @@ function drawBricks(){
         bricks[i][j].y = brickY;
         ctx.beginPath();
         ctx.rect(brickX, brickY, brickWidth, brickHeight);
-        ctx.fillStyle = "#0095DD";
+        ctx.fillStyle = colors[i][j];
         ctx.fill();
         ctx.closePath();
       }
