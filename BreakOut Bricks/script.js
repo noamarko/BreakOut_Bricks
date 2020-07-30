@@ -27,12 +27,25 @@ var brickOffsetLeft = 30;
 
 var bricks = [];
 var colors = [];
-for(var i = 0; i < brickColumnCount; i++){
+for(var i = 0; i < brickColumnCount*level; i++){
   bricks[i] = [];
   colors[i] = []
-  for(var j = 0; j < brickRowCount; j++){
+  for(var j = 0; j < brickRowCount*level; j++){
     bricks[i][j] = { x: 0, j: 0, status: 1};
     colors[i][j] = RandColor();
+  }
+}
+function reset(){
+  x = canvas.width/2;
+  y = canvas.height-30;
+  paddleX = (canvas.width - paddleWidth)/2;
+  for(var i = 0; i < brickColumnCount*level; i++){
+    bricks[i] = [];
+    colors[i] = []
+    for(var j = 0; j < brickRowCount*level; j++){
+      bricks[i][j] = { x: 0, j: 0, status: 1};
+      colors[i][j] = RandColor();
+    }
   }
 }
 
@@ -66,31 +79,60 @@ function keyUpHandler(e){
 }
 
 function collisionDetection() {
-    for (var c = 0; c < brickColumnCount; c++) {
-        for (var r = 0; r < brickRowCount; r++) {
-            var b = bricks[c][r];
+    for (var i = 0; i < brickColumnCount*level; i++) {
+        for (var j = 0; j < brickRowCount*level; j++) {
+            var b = bricks[i][j];
             if (b.status == 1) {
-                if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
-                  dy = -dy;
+                if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {//if x < starting point of brick: dx = -dx
+                    dy = -dy;
                     b.status = 0;
                     score++;
-                    if(score == brickRowCount*brickColumnCount){
-                      alert("YOU WIN!! CONGRATS!");
-                      document.location.reload();
-                    }
-                }
-            }
-        }
-    }
+                    if(score == (brickRowCount*level)*(brickColumnCount*level)){
+                      if(wins != 3){
+                        alert("NEXT LEVEL");
+                        wins++;
+                        score = 0;
+                        level++;
+                        reset();
+                        requestAnimationFrame(draw);
+                        }
+                      }
+                      else if(wins == 3){
+                        alert("Finished the game! CONGRATS!!")
+                        score = 0;
+                        wins = 0;
+                        lives = 3;
+                        document.location.reload();
+                      }
+                  }
+              }
+          }
+      }
 }
 
 
 function drawBricks(){
-  for(var i = 0; i < brickColumnCount; i++){
-    for(var j = 0; j < brickRowCount; j++){
+  for(var i = 0; i < brickColumnCount*level; i++){
+    for(var j = 0; j < brickRowCount*level; j++){
       if(bricks[i][j].status == 1){
-        var brickX = (i*(brickWidth+brickPadding))+brickOffsetLeft;
-        var brickY = (j*(brickHeight+brickPadding))+brickOffsetTop;
+        if(!wins){
+          let brickOffsetTop = canvas.width/2+canvas.height/2 - 500;
+          let brickOffsetLeft = canvas.width/2 - 500;
+          var brickX = (i*(brickWidth+brickPadding))+brickOffsetTop;
+          var brickY = (j*(brickHeight+brickPadding))+brickOffsetLeft;
+        }
+        else if(wins == 1){
+          let brickOffsetTop = canvas.width/2+canvas.height/2 - 700;
+          let brickOffsetLeft = canvas.width/2 - 500;
+          var brickX = (i*(brickWidth+brickPadding))+brickOffsetTop;
+          var brickY = (j*(brickHeight+brickPadding))+brickOffsetLeft;
+        }
+        else if(wins == 2){
+          let brickOffsetTop = canvas.width/2+canvas.height/2 - 900;
+          let brickOffsetLeft = canvas.width/2 - 500;
+          var brickX = (i*(brickWidth+brickPadding))+brickOffsetTop;
+          var brickY = (j*(brickHeight+brickPadding))+brickOffsetLeft;
+        }
         bricks[i][j].x = brickX;
         bricks[i][j].y = brickY;
         ctx.beginPath();
@@ -102,6 +144,16 @@ function drawBricks(){
     }
   }
 }
+
+function RandColor() {
+     var letters = '0123456789ABCDEF';
+     var color = '#';
+     for (var i = 0; i < 6; i++) {
+       color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+}
+
 
 function drawPaddle(){
   ctx.beginPath();
@@ -133,11 +185,12 @@ function drawLives(){
 }
 
 function draw(){
-  ctx.clearRect(0,0, canvas.width, canvas.height);
+ ctx.clearRect(0,0, canvas.width, canvas.height);
   drawBricks();
   drawBall();
   drawPaddle();
   drawScore();
+  drawWins();
   drawLives();
   collisionDetection();
   //ball collision detection with frame
